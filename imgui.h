@@ -2305,6 +2305,7 @@ struct ImGuiStyle
 {
     float       FontSizeBase;               // Current base font size (scaling applied). Use PushFont()/PushFontSize() to modify. Use ImGui::GetFontSize() to obtain scaled value.
     float       FontScaleMain;              // Main global scale factor. Other scale factors may apply.
+    float       FontScaleDpi;               // Scale factor from viewport/monitor. When io.ConfigDpiScaleFonts is enabled, this is automatically overwritten when changing monitor.
 
     float       Alpha;                      // Global alpha applies to everything in Dear ImGui.
     float       DisabledAlpha;              // Additional alpha multiplier applied by BeginDisabled(). Multiply over current value of Alpha.
@@ -2378,7 +2379,7 @@ struct ImGuiStyle
 
     // Functions
     IMGUI_API   ImGuiStyle();
-    IMGUI_API   void ScaleAllSizes(float scale_factor);
+    IMGUI_API   void ScaleAllSizes(float scale_factor); // Scale all spacing/padding/thickness values. Do not scale fonts.
 
     // Obsolete names
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
@@ -2452,7 +2453,7 @@ struct ImGuiIO
 
     // DPI/Scaling options
     // This may keep evolving during 1.92.x releases. Expect some turbulence.
-    bool        ConfigDpiScaleFonts;            // = false          // [EXPERIMENTAL] Request bitmap-scaled fonts to match DpiScale. This is a very low-quality workaround. The correct way to handle DPI is _currently_ to replace the atlas and/or fonts in the Platform_OnChangedViewport callback, but this is all early work in progress.
+    bool        ConfigDpiScaleFonts;            // = false          // [EXPERIMENTAL] Automatically overwrite style.FontScaleDpi when Monitor DPI changes. This will scale fonts but _NOT_ scale sizes/padding for now.
     bool        ConfigDpiScaleViewports;        // = false          // [EXPERIMENTAL] Scale Dear ImGui and Platform Windows when Monitor DPI changes.
 
     // Miscellaneous options
