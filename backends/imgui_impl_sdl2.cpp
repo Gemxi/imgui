@@ -809,6 +809,26 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
     }
 }
 
+// - On Windows the process needs to be marked DPI-aware!! SDL2 doesn't do it by default. You can call ::SetProcessDPIAware() or call ImGui_ImplWin32_EnableDpiAwareness() from Win32 backend.
+// - Apple platforms use FramebufferScale so we always return 1.0f.
+// - Some accessibility applications are declaring virtual monitors with a DPI of 0.0f, see #7902. We preserve this value for caller to handle.
+float ImGui_ImplSDL2_GetContentScaleForWindow(SDL_Window* window)
+{
+    return ImGui_ImplSDL2_GetContentScaleForDisplay(SDL_GetWindowDisplayIndex(window));
+}
+
+float ImGui_ImplSDL2_GetContentScaleForDisplay(int display_index)
+{
+#if SDL_HAS_PER_MONITOR_DPI
+#ifndef __APPLE__
+    float dpi = 0.0f;
+    if (SDL_GetDisplayDPI(display_index, &dpi, nullptr, nullptr) == 0)
+        return dpi / 96.0f;
+#endif
+#endif
+    return 1.0f;
+}
+
 static void ImGui_ImplSDL2_CloseGamepads()
 {
     ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
