@@ -932,6 +932,33 @@ static void ImGui_ImplGlfw_UpdateGamepads()
     #undef MAP_ANALOG
 }
 
+// - On Windows the process needs to be marked DPI-aware!! SDL2 doesn't do it by default. You can call ::SetProcessDPIAware() or call ImGui_ImplWin32_EnableDpiAwareness() from Win32 backend.
+// - Apple platforms use FramebufferScale so we always return 1.0f.
+// - Some accessibility applications are declaring virtual monitors with a DPI of 0.0f, see #7902. We preserve this value for caller to handle.
+float ImGui_ImplGlfw_GetContentScaleForWindow(GLFWwindow* window)
+{
+#if GLFW_HAS_PER_MONITOR_DPI && !defined(__APPLE__)
+    float x_scale, y_scale;
+    glfwGetWindowContentScale(window, &x_scale, &y_scale);
+    return x_scale;
+#else
+    IM_UNUSED(window);
+    return 1.0f;
+#endif
+}
+
+float ImGui_ImplGlfw_GetContentScaleForMonitor(GLFWmonitor* monitor)
+{
+#if GLFW_HAS_PER_MONITOR_DPI && !defined(__APPLE__)
+    float x_scale, y_scale;
+    glfwGetMonitorContentScale(monitor, &x_scale, &y_scale);
+    return x_scale;
+#else
+    IM_UNUSED(monitor);
+    return 1.0f;
+#endif
+}
+
 static void ImGui_ImplGlfw_UpdateMonitors()
 {
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
